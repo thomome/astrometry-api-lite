@@ -37,7 +37,8 @@
     "worker:copy-conf": "copyfiles -u 1 \"./src/worker/*.json\" \"./dist\"",
     "worker:develop": "npm run worker:build && concurrently -k -p \"[{name}]\" -n \"TS\" -c \"yellow.bold\" \"npm run worker:tsc-watcher\"",
     "worker:tsc": "tsc -p tsconfig.worker.json",
-    "worker:tsc-watcher": "tsc -p tsconfig.worker.json --watch"
+    "worker:tsc-watcher": "tsc -p tsconfig.worker.json --watch",
+    "server": "concurrently 'node dist/api/server.js' 'node dist/manager/main.js'"
   },
   "dependencies": {
     "async": "2.6.0",

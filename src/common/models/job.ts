@@ -39,7 +39,9 @@ export interface JobCalibrationResultData {
   result_pixscale: number,
   result_radius: number,
   result_ra: number,
-  result_dec: number
+  result_dec: number,
+  result_tags: string,
+  result_annotations: string
 }
 
 export enum ResultImageType {

@@ -76,21 +76,43 @@ export async function processQueueItem() {
       console.log("Solve-field solver run completed successfully");
 
       const wcsTableFile = `${outDir}/wcs-table`;
-      let wcsStream = fs.createWriteStream(wcsTableFile, { flags: "w" });
-      const streamPromise = new Promise<void>((resolve, reject) => {
-        wcsStream.on("close", () => resolve());
+      let wcsTableStream = fs.createWriteStream(wcsTableFile, { flags: "w" });
+      const streamTablePromise = new Promise<void>((resolve, reject) => {
+        wcsTableStream.on("close", () => resolve());
       });
-      await spawn(`wcsinfo`, [`${outDir}/wcs`], null, wcsStream).catch((err) => {
+      await spawn(`wcsinfo`, [`${outDir}/wcs`], null, wcsTableStream).catch((err) => {
         console.error("Failed to run wcsinfo on results!");
-        wcsStream.close();
+        wcsTableStream.close();
         throw err;
       });
-      wcsStream.close();
-      await streamPromise;
+      wcsTableStream.close();
+      await streamTablePromise;
       const wcsTable = fs.readFileSync(wcsTableFile).toString();
       const solverResult = wcsTableToJson(wcsTable);
-
       console.log("WCS list parsed");
+
+
+      const wcsObjectsFile = `${outDir}/wcs-objects`;
+      let wcsObjectsStream = fs.createWriteStream(wcsObjectsFile, { flags: "w" });
+      const streamObjectsPromise = new Promise<void>((resolve, reject) => {
+        wcsObjectsStream.on("close", () => resolve());
+      });
+      await spawn('plot-constellations', ['-w', `${outDir}/wcs`, '-L', '-N', '-C', '-B', '-J'], null, null, wcsObjectsStream).catch((err) => {
+        console.error("Failed to run plot-constellations on results!");
+        wcsObjectsStream.close();
+        throw err;
+      });
+      wcsObjectsStream.close();
+      await streamObjectsPromise;
+      const wcsObjects = fs.readFileSync(wcsObjectsFile).toString();
+      const objectsResult = JSON.parse(wcsObjects);
+      const tagsResults = [];
+      objectsResult.annotations.forEach((anno) => {
+        tagsResults.push(...anno.names);
+      });
+      console.log("Objects parsed");
+
+
 
       let objImage = "";
       let objImageThumb = "";
@@ -128,7 +150,9 @@ export async function processQueueItem() {
         result_ra: solverResult.ra_center ? solverResult.ra_center : null,
         result_radius: solverResult.imagew && solverResult.imageh && solverResult.pixscale
           ? calcRadius(solverResult.imagew, solverResult.imageh, solverResult.pixscale)
-          : null
+          : null,
+        result_annotations: JSON.stringify(objectsResult),
+        result_tags: tagsResults.join(',')
       };
 
       const imageDatas = [];

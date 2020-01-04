@@ -190,10 +190,12 @@ export class SqliteJobQueue {
         resultData.result_parity,
         resultData.result_pixscale,
         resultData.result_ra,
-        resultData.result_radius
+        resultData.result_radius,
+        resultData.result_annotations,
+        resultData.result_tags
       ];
       const stmt = await this.db.prepare(`update JobQueue set processing_state = 2, processing_finished = ?, result_dec = ?,
-                result_orientation = ?, result_parity = ?, result_pixscale = ?, result_ra = ?, result_radius = ?
+                result_orientation = ?, result_parity = ?, result_pixscale = ?, result_ra = ?, result_radius = ?, result_annotations = ?, result_tags = ?
                 where id = ${itemId}`);
       await stmt.run(updateData);
       await stmt.finalize();

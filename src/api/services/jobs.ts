@@ -66,7 +66,9 @@ export async function getCalibrationData(id: number): Promise<JobCalibrationResu
     result_parity: item.result_parity,
     result_pixscale: item.result_pixscale,
     result_ra: item.result_ra,
-    result_radius: item.result_radius
+    result_radius: item.result_radius,
+    result_tags: item.result_tags,
+    result_annotations: item.result_annotations
   };
 
 }

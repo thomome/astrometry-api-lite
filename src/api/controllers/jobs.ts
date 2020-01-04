@@ -90,9 +90,9 @@ export class JobsController {
 
 
     const result: JobInfoResponse = {
-      machine_tags: [],
-      tags: [],
-      objects_in_field: [],
+      machine_tags: data.result_tags.split(','),
+      tags: data.result_tags.split(','),
+      objects_in_field: data.result_tags.split(','),
       calibration: {
         dec: data.result_dec,
         orientation: data.result_orientation,
