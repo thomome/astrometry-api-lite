@@ -147,6 +147,24 @@ const models: TsoaRoute.Models = {
             "objects_in_field": { "dataType": "array", "array": { "dataType": "string" }, "required": true },
         },
     },
+    "Function": {
+        "properties": {
+            "prototype": { "dataType": "any", "required": true },
+            "length": { "dataType": "double", "required": true },
+            "arguments": { "dataType": "any", "required": true },
+            "caller": { "ref": "Function", "required": true },
+        },
+    },
+    "Object": {
+        "properties": {
+            "constructor": { "ref": "Function", "required": true },
+        },
+    },
+    "JobAnnotationsResponse": {
+        "properties": {
+            "annotations": { "dataType": "array", "array": { "ref": "Object" }, "required": true },
+        },
+    },
     "ApiSupports": {
         "properties": {
             "jobCancellationSupported": { "dataType": "boolean", "required": true },
@@ -413,6 +431,42 @@ export function RegisterRoutes(app: any) {
 
             const controller = new JobsController();
             const promise = controller.getInfoPost.apply(controller, validatedArgs);
+            promiseHandler(controller, promise, response, next);
+        })
+    );
+    app.get('/api/jobs/:id/annotations',
+        asyncErrorHandler(async (request: any, response: any, next: any) => {
+            const args = {
+                id: { "in": "path", "name": "id", "required": true, "dataType": "double" },
+            };
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller = new JobsController();
+            const promise = controller.getAnnotations.apply(controller, validatedArgs);
+            promiseHandler(controller, promise, response, next);
+        })
+    );
+    app.post('/api/jobs/:id/annotations',
+        asyncErrorHandler(async (request: any, response: any, next: any) => {
+            const args = {
+                id: { "in": "path", "name": "id", "required": true, "dataType": "double" },
+            };
+
+            let validatedArgs: any[] = [];
+            try {
+                validatedArgs = getValidatedArgs(args, request);
+            } catch (err) {
+                return next(err);
+            }
+
+            const controller = new JobsController();
+            const promise = controller.getAnnotationsPost.apply(controller, validatedArgs);
             promiseHandler(controller, promise, response, next);
         })
     );

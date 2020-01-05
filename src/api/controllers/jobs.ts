@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import { Get, Post, Route, Body, Tags } from "tsoa";
 import * as datetime from "node-datetime";
-import { JobStatusResponse, JobStatusResponseStatus, JobCalibrationResponse, JobInfoResponse } from "../models/job";
+import { JobStatusResponse, JobStatusResponseStatus, JobCalibrationResponse, JobInfoResponse, JobAnnotationsResponse } from "../models/job";
 import * as Jobs from "../services/jobs";
 import { ProcessingState } from "../models/job";
 import { ApiError } from "../models/error";
@@ -111,6 +111,30 @@ export class JobsController {
   @Post("{id}/info")
   async getInfoPost(id: number): Promise<JobInfoResponse> {
     return await this.getInfo(id);
+  }
+
+  @Get("{id}/annotations")
+  async getAnnotations(id: number): Promise<JobAnnotationsResponse> {
+    const data = await Jobs.getFullData(id);
+    if (!data) {
+      throw new ApiError("job not found", 404);
+    }
+
+    let status = data.processing_state == 0 ? JobStatusResponseStatus.none
+      : data.processing_state == 1 ? JobStatusResponseStatus.solving
+        : data.processing_state == 2 ? JobStatusResponseStatus.success
+          : data.processing_state == 3 ? JobStatusResponseStatus.failure
+            : JobStatusResponseStatus.none;
+
+    const result = JSON.parse(data.result_annotations);
+            
+    return result;
+  }
+
+  // To comply with Nova also supporting POST
+  @Post("{id}/annotations")
+  async getAnnotationsPost(id: number): Promise<JobAnnotationsResponse> {
+    return await this.getAnnotations(id);
   }
 
 }

@@ -47,3 +47,7 @@ export interface JobInfoResponse extends JobStatusResponse {
   original_filename: string,
   objects_in_field: Array<string>
 }
+
+export interface JobAnnotationsResponse {
+  annotations: Array<Object>
+}

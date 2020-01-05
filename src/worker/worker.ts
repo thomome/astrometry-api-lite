@@ -97,7 +97,7 @@ export async function processQueueItem() {
       const streamObjectsPromise = new Promise<void>((resolve, reject) => {
         wcsObjectsStream.on("close", () => resolve());
       });
-      await spawn('plot-constellations', ['-w', `${outDir}/wcs`, '-L', '-N', '-C', '-B', '-J'], null, null, wcsObjectsStream).catch((err) => {
+      await spawn('plot-constellations', ['-w', `${outDir}/wcs`, '-L', '-N', '-C', '-B', '-J', '-F', '0'], null, null, wcsObjectsStream).catch((err) => {
         console.error("Failed to run plot-constellations on results!");
         wcsObjectsStream.close();
         throw err;
@@ -110,6 +110,9 @@ export async function processQueueItem() {
       objectsResult.annotations.forEach((anno) => {
         tagsResults.push(...anno.names);
       });
+      const annotationsResults = {
+        annotations: objectsResult.annotations
+      };
       console.log("Objects parsed");
 
 
@@ -151,7 +154,7 @@ export async function processQueueItem() {
         result_radius: solverResult.imagew && solverResult.imageh && solverResult.pixscale
           ? calcRadius(solverResult.imagew, solverResult.imageh, solverResult.pixscale)
           : null,
-        result_annotations: JSON.stringify(objectsResult),
+        result_annotations: JSON.stringify(annotationsResults),
         result_tags: tagsResults.join(',')
       };
 
