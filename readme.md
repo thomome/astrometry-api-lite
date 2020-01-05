@@ -62,6 +62,7 @@ The API implements the following astrometry.net endpoints:
 - /api/jobs/{id}
 - /api/jobs/{id}/calibration
 - /api/jobs/{id}/info
+- /api/jobs/{id}/annotations
 - /api/submissions/{id}
 
 Additionally, the following endpoints are provided for management purposes:
